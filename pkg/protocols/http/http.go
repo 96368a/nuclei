@@ -304,6 +304,9 @@ func (request *Request) Compile(options *protocols.ExecutorOptions) error {
 		return errors.Wrap(err, "validation error")
 	}
 
+	// 设置始终跳过变量检查
+	request.SkipVariablesCheck = true
+
 	connectionConfiguration := &httpclientpool.Configuration{
 		Threads:       request.Threads,
 		MaxRedirects:  request.MaxRedirects,
