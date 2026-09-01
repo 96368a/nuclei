@@ -194,6 +194,7 @@ func (e *NucleiEngine) init(ctx context.Context) error {
 		InputHelper:        input.NewHelper(),
 		TemporaryDirectory: e.tmpDir,
 		Logger:             e.opts.Logger,
+		OnAllEvents:        e.onAllEventsCallback,
 	}
 	if e.opts.ShouldUseHostError() && e.hostErrCache != nil {
 		e.executerOpts.HostErrorsCache = e.hostErrCache

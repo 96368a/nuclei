@@ -482,6 +482,19 @@ func EnableMatcherStatus() NucleiSDKOptions {
 	}
 }
 
+// WithAllEventsCallback registers a callback invoked for every request event
+// (matched or not), unlike the result callback which only receives matched
+// results and the last unmatched event. The callback receives the internal
+// wrapped event whose InternalEvent contains the raw request/response dump
+// (keys "request"/"response"). Useful for consumers that need the raw
+// request of every executed request (e.g. IPS detection).
+func WithAllEventsCallback(callback func(event *output.InternalWrappedEvent)) NucleiSDKOptions {
+	return func(e *NucleiEngine) error {
+		e.onAllEventsCallback = callback
+		return nil
+	}
+}
+
 // WithAuthProvider allows setting a custom authprovider implementation
 func WithAuthProvider(provider authprovider.AuthProvider) NucleiSDKOptions {
 	return func(e *NucleiEngine) error {

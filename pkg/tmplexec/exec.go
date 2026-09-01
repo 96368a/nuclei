@@ -152,6 +152,15 @@ func (e *TemplateExecuter) Execute(ctx *scan.ScanContext) (bool, error) {
 			// something went wrong
 			return
 		}
+
+		// notify external consumers (e.g. SDK IPS detection) of every request
+		// event (matched or not, including internal matcher events), unlike the
+		// output writer which only receives matched results and the last
+		// unmatched event
+		if e.options.OnAllEvents != nil {
+			e.options.OnAllEvents(event)
+		}
+
 		// check for internal true matcher event
 		if event.HasOperatorResult() && event.OperatorsResult.Matched && event.OperatorsResult.Operators != nil {
 			// note all matchers should have internal:true if it is a combination then print it

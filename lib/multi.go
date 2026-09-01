@@ -27,8 +27,14 @@ type unsafeOptions struct {
 }
 
 // createEphemeralObjects creates ephemeral nuclei objects/instances/types
-func createEphemeralObjects(ctx context.Context, base *NucleiEngine, opts *types.Options) (*unsafeOptions, error) {
+func createEphemeralObjects(ctx context.Context, base *NucleiEngine, tmpEngine *NucleiEngine, opts *types.Options) (*unsafeOptions, error) {
 	u := &unsafeOptions{}
+	// prefer per-invocation callback (set on tmpEngine via ExecuteNucleiWithOptsCtx
+	// options), fall back to the base engine one set at construction time
+	onAllEvents := tmpEngine.onAllEventsCallback
+	if onAllEvents == nil {
+		onAllEvents = base.onAllEventsCallback
+	}
 	u.executerOpts = &protocols.ExecutorOptions{
 		Output:          base.customWriter,
 		Options:         opts,
@@ -42,6 +48,7 @@ func createEphemeralObjects(ctx context.Context, base *NucleiEngine, opts *types
 		ResumeCfg:       types.NewResumeCfg(),
 		Parser:          base.parser,
 		Browser:         base.browserInstance,
+		OnAllEvents:     onAllEvents,
 	}
 	if opts.ShouldUseHostError() && base.hostErrCache != nil {
 		u.executerOpts.HostErrorsCache = base.hostErrCache
@@ -133,7 +140,7 @@ func (e *ThreadSafeNucleiEngine) ExecuteNucleiWithOptsCtx(ctx context.Context, t
 	}
 
 	// create ephemeral nuclei objects/instances/types using base nuclei engine
-	unsafeOpts, err := createEphemeralObjects(ctx, e.eng, tmpEngine.opts)
+	unsafeOpts, err := createEphemeralObjects(ctx, e.eng, tmpEngine, tmpEngine.opts)
 	if err != nil {
 		return err
 	}

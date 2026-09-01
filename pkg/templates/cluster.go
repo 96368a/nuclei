@@ -248,6 +248,11 @@ func (e *ClusterExecuter) Execute(ctx *scan.ScanContext) (bool, error) {
 			// unlikely but just in case
 			return
 		}
+		// notify external consumers (e.g. SDK IPS detection) of every request
+		// event, since clustered execution bypasses ctx.OnResult
+		if e.options.OnAllEvents != nil {
+			e.options.OnAllEvents(event)
+		}
 		if event.InternalEvent == nil {
 			event.InternalEvent = make(map[string]interface{})
 		}

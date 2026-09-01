@@ -63,6 +63,7 @@ type NucleiEngine struct {
 	disableTemplatesAutoUpgrade bool
 	enableStats                 bool
 	onUpdateAvailableCallback   func(newVersion string)
+	onAllEventsCallback         func(event *output.InternalWrappedEvent)
 
 	// ready-status fields
 	templatesLoaded bool

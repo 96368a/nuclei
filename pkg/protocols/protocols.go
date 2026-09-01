@@ -138,6 +138,11 @@ type ExecutorOptions struct {
 	Logger *gologger.Logger
 	// CustomFastdialer is a fastdialer dialer instance
 	CustomFastdialer *fastdialer.Dialer
+	// OnAllEvents is an optional callback invoked for every request event
+	// (matched or not), unlike the output writer which only receives matched
+	// results and the last unmatched event. Used by SDK consumers that need
+	// the raw request of every executed request (e.g. IPS detection).
+	OnAllEvents func(event *output.InternalWrappedEvent)
 }
 
 // todo: centralizing components is not feasible with current clogged architecture
@@ -299,6 +304,7 @@ func (e *ExecutorOptions) Copy() *ExecutorOptions {
 		ExportReqURLPattern: e.ExportReqURLPattern,
 		GlobalMatchers:      e.GlobalMatchers,
 		Logger:              e.Logger,
+		OnAllEvents:         e.OnAllEvents,
 	}
 	copy.CreateTemplateCtxStore()
 	return copy
